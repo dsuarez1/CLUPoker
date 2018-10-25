@@ -19,7 +19,7 @@ public class Player {
     
     public Player()
     {
-        this.balance = 1000;
+        this.balance = 5000;
         this.hand = new Card[2];
         this.hand_count = 0; // track the amount of cards added to hand
         this.inHand = false;

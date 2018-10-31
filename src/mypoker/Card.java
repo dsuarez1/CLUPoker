@@ -14,7 +14,9 @@ package mypoker;
 public class Card {
     //attributes
     private Suit suit;
+    private String suitString;
     private int value;
+    
     
     public Card(int s, int v)
     {
@@ -22,20 +24,30 @@ public class Card {
         {
             case 1:
                 this.suit = Suit.DIAMONDS;
+                this.suitString = "Diamond";
                 break;
             case 2:
                 this.suit = Suit.SPADES;
+                this.suitString = "Spade";
                 break;
             case 3:
                 this.suit = Suit.CLUBS;
+                this.suitString = "Club";
                 break;
             case 4:
                 this.suit = Suit.HEARTS;
+                this.suitString = "Heart";
                 break;
         }
         
         this.value = v;
     }
+
+    public String getSuitString() {
+        return suitString;
+    }
+    
+    
     
     public Suit getSuit()
     {

@@ -339,7 +339,7 @@ public class PokerWindow extends javax.swing.JFrame {
         this.betAmount.setText("");
 
         //handle button enabling COME BACK TO THIS
-        choosePlayer();
+        currentPlayer = choosePlayer();
 
     }//GEN-LAST:event_betButtonActionPerformed
 

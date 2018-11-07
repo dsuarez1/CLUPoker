@@ -30,8 +30,8 @@ public class Table {
         this.tableCards = new ArrayList<>();
     }
     
-    public void getBets(){
-        
+    public void incPot(int amount){
+        this.pot += amount;
     }
 
     public void addPlayer(Player p) {

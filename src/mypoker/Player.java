@@ -15,7 +15,8 @@ public class Player {
     private double balance;
     private Card[] hand;
     private int hand_count;
-    boolean inHand;
+    private boolean inHand;
+    private boolean isTurn;
     
     public Player()
     {
@@ -23,8 +24,19 @@ public class Player {
         this.hand = new Card[2];
         this.hand_count = 0; // track the amount of cards added to hand
         this.inHand = false;
+        this.isTurn = false;
     }
 
+    public boolean isIsTurn() {
+        return isTurn;
+    }
+
+    public void setIsTurn(boolean isTurn) {
+        this.isTurn = isTurn;
+    }
+
+    
+    
     public int getHand_count() {
         return hand_count;
     }
@@ -44,7 +56,13 @@ public class Player {
         return amount; 
     }
 
+    public void incBalance(double amount) {
+        this.balance += amount;
+    }
     
+    public void decBalance(double amount) {
+        this.balance -= amount;
+    }
     
     public double getBalance() {
         return balance;

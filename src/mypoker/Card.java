@@ -15,11 +15,14 @@ public class Card {
     //attributes
     private Suit suit;
     private String suitString;
+    private int imageIndex;
     private int value;
     
     
     public Card(int s, int v)
     {
+        this.value = v;
+        this.imageIndex = value;
         switch(s)
         {
             case 1:
@@ -28,23 +31,30 @@ public class Card {
                 break;
             case 2:
                 this.suit = Suit.SPADES;
+                this.imageIndex = imageIndex + 13;
                 this.suitString = "Spade";
                 break;
             case 3:
                 this.suit = Suit.CLUBS;
+                this.imageIndex = imageIndex + 26;
                 this.suitString = "Club";
                 break;
             case 4:
                 this.suit = Suit.HEARTS;
+                this.imageIndex = imageIndex + 39;
                 this.suitString = "Heart";
                 break;
         }
         
-        this.value = v;
+        
     }
 
     public String getSuitString() {
         return suitString;
+    }
+
+    public int getImageIndex() {
+        return imageIndex;
     }
     
     

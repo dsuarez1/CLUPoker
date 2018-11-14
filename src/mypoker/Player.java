@@ -16,23 +16,35 @@ public class Player {
     private Card[] hand;
     private int hand_count;
     private boolean inHand;
-    private boolean isTurn;
+    private boolean turn;
+    private boolean hasBet;
     
     public Player()
     {
         this.balance = 5000;
         this.hand = new Card[2];
         this.hand_count = 0; // track the amount of cards added to hand
-        this.inHand = false;
-        this.isTurn = false;
+        this.inHand = false; 
+        this.turn = false; 
+        this.hasBet = false; //checks if the player has bet in the current round
     }
 
-    public boolean isIsTurn() {
-        return isTurn;
+    public boolean isHasBet() {
+        return hasBet;
     }
 
-    public void setIsTurn(boolean isTurn) {
-        this.isTurn = isTurn;
+    public void setHasBet(boolean hasBet) {
+        this.hasBet = hasBet;
+    }
+
+    
+    
+    public boolean isTurn() {
+        return turn;
+    }
+
+    public void setTurn(boolean isTurn) {
+        this.turn = isTurn;
     }
 
     

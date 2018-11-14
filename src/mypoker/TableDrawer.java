@@ -113,6 +113,26 @@ public abstract class TableDrawer {
         }
     }
         
+    public static void dealFlop(Table t,PokerWindow window){
+        System.out.println("dealing flop");
+        t.dealFlop();
+        window.TableCard1.setIcon(new ImageIcon(images[t.getTableCards().get(0).getImageIndex()].getImage().getScaledInstance(75, 100, Image.SCALE_SMOOTH)));
+        window.TableCard2.setIcon(new ImageIcon(images[t.getTableCards().get(1).getImageIndex()].getImage().getScaledInstance(75, 100, Image.SCALE_SMOOTH)));
+        window.TableCard3.setIcon(new ImageIcon(images[t.getTableCards().get(2).getImageIndex()].getImage().getScaledInstance(75, 100, Image.SCALE_SMOOTH)));
+    }
+    
+    public static void dealTurn(Table t,PokerWindow window){
+        System.out.println("dealing turn");
+        t.dealTurnOrRiver();
+        window.TableCard4.setIcon(new ImageIcon(images[t.getTableCards().get(3).getImageIndex()].getImage().getScaledInstance(75, 100, Image.SCALE_SMOOTH))); 
+    }
+    
+    public static void dealRiver(Table t,PokerWindow window){
+        System.out.println("dealing river");
+        t.dealTurnOrRiver();
+        window.TableCard5.setIcon(new ImageIcon(images[t.getTableCards().get(4).getImageIndex()].getImage().getScaledInstance(75, 100, Image.SCALE_SMOOTH))); 
+    }
+    
     public static void changeCardLabels(PokerWindow window,int PlayerNum,Player p){
         //make method to change window labels  
     }

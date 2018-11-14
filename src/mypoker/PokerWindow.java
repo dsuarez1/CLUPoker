@@ -6,9 +6,6 @@
 package mypoker;
 
 import java.util.ArrayList;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-
 /**
  *
  * @author DannySuarez
@@ -18,7 +15,7 @@ public class PokerWindow extends javax.swing.JFrame {
     public static int numPlayers = 4;
     public static int currentPlayer = 0;
     public static Table table1;
-    public static boolean betPhase = false;
+    public static int phase = 0;  //the phase represents what part of the hand we are in 0 = preflop, 1=flop,2=turn,3=river
     public ArrayList<javax.swing.JLabel> cardLabels = new ArrayList<>();
 
     /**
@@ -89,6 +86,11 @@ public class PokerWindow extends javax.swing.JFrame {
         raiseButton.setText("Raise");
 
         checkButton.setText("Check");
+        checkButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                checkButtonActionPerformed(evt);
+            }
+        });
 
         foldButton.setText("Fold");
         foldButton.addActionListener(new java.awt.event.ActionListener() {
@@ -229,17 +231,19 @@ public class PokerWindow extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel5)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(P4Balance))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(P4Card1, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(P4Card2, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(36, 36, 36))
-                            .addGroup(layout.createSequentialGroup()
                                 .addGap(38, 38, 38)
-                                .addComponent(callButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
+                                .addComponent(callButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(jLabel5)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(P4Balance))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(P4Card1, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(P4Card2, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGap(36, 36, 36)))))
                 .addContainerGap())
             .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                 .addGap(352, 352, 352)
@@ -303,11 +307,9 @@ public class PokerWindow extends javax.swing.JFrame {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(P3Card2, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(P3Card1, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(69, 69, 69)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addGap(0, 0, Short.MAX_VALUE)
-                                .addComponent(TableCard1, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(TableCard1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(TableCard2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(TableCard3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(layout.createSequentialGroup()
@@ -329,30 +331,41 @@ public class PokerWindow extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    
+    //if a player bets or raises everyone elses hasBet flag needs to be set back to true so that they may then raise fold or call 
     private void betButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_betButtonActionPerformed
+        //table1.getPlayers().get(currentPlayer).setTurn(false);
+        table1.getPlayers().get(currentPlayer).setHasBet(true);
         int amount = Integer.valueOf(this.betAmount.getText());
         table1.incPot(amount);
         this.potAmount.setText(Double.toString(table1.getPot()));
         table1.getPlayers().get(currentPlayer).decBalance(amount);
         this.betButton.setEnabled(false);
         this.checkButton.setEnabled(false);
-        this.betAmount.setText("");
-
-        //handle button enabling COME BACK TO THIS
-        currentPlayer = choosePlayer();
-
+        this.betAmount.setText("0.00");
+        this.callButton.setEnabled(true);
+        this.raiseButton.setEnabled(true);
+        
+        resetHasBetFlags(); //since a player just bet this means each player now needs to make another turn
+        
+        currentPlayer = this.choosePlayer();
+        
     }//GEN-LAST:event_betButtonActionPerformed
 
 
     private void startGame(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startGame
-
+        for(Player p: table1.getPlayers()){
+            p.setInHand(true);
+            p.setHand_count(0);
+        }
         table1.dealPlayers();
         TableDrawer.generateImageArray(this);
         TableDrawer.startHand(table1, this);
         this.betButton.setEnabled(true);
         this.checkButton.setEnabled(true);
         this.foldButton.setEnabled(true);
-        table1.getPlayers().get(currentPlayer).setIsTurn(true);
+        this.startButton.setEnabled(false);
+        //table1.getPlayers().get(currentPlayer).setTurn(true);
 
         //call Game Loop Method
 //        for(Player p : table1.getPlayers()){
@@ -361,26 +374,119 @@ public class PokerWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_startGame
 
     private void foldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_foldActionPerformed
-        //remove player from list 
-        //choose newPlayer
+        //table1.getPlayers().get(currentPlayer).setTurn(false);
+        table1.getPlayers().get(currentPlayer).setHasBet(true);
         table1.getPlayers().get(currentPlayer).setInHand(false);
-        currentPlayer = choosePlayer();
-        table1.getPlayers().get(currentPlayer).setIsTurn(true);
+        table1.decPlayersInHand();
+        
+        //if all but one player has folded the round is over
+        if(table1.getPlayersInHand() == 1){
+            //the hand is over
+            currentPlayer = this.lastPlayer(); //find the last player in hand this is the winner of the hand
+            table1.getPlayers().get(currentPlayer).incBalance(table1.getPot());
+            this.resetTable();
+        }
+        else if (playersStillWaiting()){ //if there are still players waiting to bet
+            currentPlayer = choosePlayer();
+            table1.getPlayers().get(currentPlayer).setTurn(true);
+        }
+        else{ //if we get here then move to the next phase
+            if(phase == 0){
+                phase++;
+                currentPlayer =0;
+                table1.dealFlop();
+            }
+        }
+        
     }//GEN-LAST:event_foldActionPerformed
 
+    private void checkButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkButtonActionPerformed
+        //table1.getPlayers().get(currentPlayer).setTurn(false);
+        table1.getPlayers().get(currentPlayer).setHasBet(true);
+        if (playersStillWaiting()){ //if there are still players waiting to bet
+            currentPlayer = choosePlayer();
+            //table1.getPlayers().get(currentPlayer).setTurn(true);
+        }
+        else{ //if we get here then move to the next phase
+            if(phase == 0){
+                phase++;
+                TableDrawer.dealFlop(table1, this);
+                currentPlayer = 0;
+                this.setBetFlags();
+                currentPlayer = choosePlayer();
+            }
+            else if(phase == 1){
+                phase++;
+                TableDrawer.dealTurn(table1, this);
+                currentPlayer = 0;
+                this.setBetFlags();
+                currentPlayer = choosePlayer();
+            }
+            else if(phase == 2){
+                phase++;
+                TableDrawer.dealRiver(table1, this);
+                currentPlayer = 0;
+                this.setBetFlags();
+                currentPlayer = choosePlayer();
+            }
+            else{
+                //check winner
+            }
+        }
+    }//GEN-LAST:event_checkButtonActionPerformed
+
+    public void setBetFlags(){
+        for(Player p : table1.getPlayers()){
+            if(p.isInHand()){
+                p.setHasBet(false);
+            }
+        }
+    }
+    //checks if players in the hand still need to go
+    public boolean playersStillWaiting(){
+        for(Player p : table1.getPlayers()){
+            if(p.isInHand() && p.isHasBet() == false){
+                return true; //this means at least one player has not gone
+            }
+        }
+        return false;
+    }
+    
+    public void resetTable(){
+        for(Player p: table1.getPlayers()){
+            //is there more to do here for players???
+            //later should check if balance is > 0 or else they shouldnt be in hand
+            p.setInHand(true);
+            p.setHand_count(0);
+        }
+        table1.setDeck(new Deck()); //repopulate a new deck
+        table1.setPot(0);
+        this.betButton.setEnabled(false);
+        this.foldButton.setEnabled(false);
+        this.raiseButton.setEnabled(false);
+        this.checkButton.setEnabled(false);
+        this.callButton.setEnabled(false);
+        this.startButton.setEnabled(true);
+        this.potAmount.setText("0.00");
+        currentPlayer = 0; //just assume the same player starts each hand we will implement blinds and what not later
+        phase = 0;   
+            
+            
+    }
+    
+    //we need to consider that if the last player to place their bet
     public int choosePlayer() {
-        table1.getPlayers().get(currentPlayer).setIsTurn(false);
         for (int i = currentPlayer; i < table1.getPlayers().size(); i++)
         {
-            if (table1.getPlayers().get(i).isInHand())
+            if (table1.getPlayers().get(i).isInHand()  && table1.getPlayers().get(i).isHasBet() == false)
             {
+                System.out.println(i);
                 return i;
             }
-
         }
         for (int j = 0; j < currentPlayer; j++)
         {
-            if (table1.getPlayers().get(j).isInHand())
+            if (table1.getPlayers().get(j).isInHand() && table1.getPlayers().get(j).isHasBet() == false)
             {
                 
                 return j;
@@ -388,7 +494,39 @@ public class PokerWindow extends javax.swing.JFrame {
         }
 
         
-        return 0;
+        return -1;
+    }
+    
+    public void resetHasBetFlags() {
+        //table1.getPlayers().get(currentPlayer).setTurn(false);
+        table1.getPlayers().get(currentPlayer).setHasBet(true);
+        for (int i = currentPlayer; i < table1.getPlayers().size(); i++)
+        {
+            if (table1.getPlayers().get(i).isInHand())
+            {
+                table1.getPlayers().get(i).setHasBet(false);
+            }
+        }
+        for (int j = 0; j < currentPlayer; j++)
+        {
+            if (table1.getPlayers().get(j).isInHand())
+            {
+                
+                table1.getPlayers().get(j).setHasBet(false);
+            }
+        }
+    }
+    
+    //once there is only one player in the hand their is a winner that needs to be chosen
+    public int lastPlayer(){
+        int playerNumber = -1;
+        for(int i = 0;i<table1.getPlayers().size();i++){
+            if(table1.getPlayers().get(i).isInHand()){
+                playerNumber = i; 
+                break;
+            }
+        }
+        return playerNumber;
     }
 
     public void gameLoop() {
@@ -418,13 +556,7 @@ public class PokerWindow extends javax.swing.JFrame {
 
     }
 
-    public boolean isBetPhase() {
-        return betPhase;
-    }
 
-    public void setBetPhase(boolean b) {
-        betPhase = b;
-    }
 
     public void addLabels() {
         this.cardLabels.add(P1Card1);

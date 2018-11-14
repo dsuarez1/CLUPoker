@@ -17,6 +17,7 @@ public class Table {
     private Deck deck;
     private ArrayList<Player> players;
     private ArrayList<Card> tableCards;
+    private int playersInHand;
 
     public Table(int numPlayers) {
         this.pot = 0;
@@ -28,12 +29,33 @@ public class Table {
 
         }
         this.tableCards = new ArrayList<>();
+        this.playersInHand = numPlayers;
     }
     
     public void incPot(int amount){
         this.pot += amount;
     }
+    
+    public void decPlayersInHand(){
+        this.playersInHand--;
+    }
 
+    public int getPlayersInHand() {
+        return playersInHand;
+    }
+
+    public void setPlayersInHand(int playersInHand) {
+        this.playersInHand = playersInHand;
+    }
+    
+    public ArrayList<Card> getTableCards() {
+        return tableCards;
+    }
+
+    public void setTableCards(ArrayList<Card> tableCards) {
+        this.tableCards = tableCards;
+    }
+    
     public void addPlayer(Player p) {
         this.players.add(p);
     }

@@ -11,7 +11,7 @@ package mypoker;
  *
  * @author pclab
  */
-public class Card {
+public class Card implements Comparable{
     //attributes
     private Suit suit;
     private String suitString;
@@ -72,6 +72,12 @@ public class Card {
     @Override
     public String toString() {
         return "Card{" + value + " Of " + suit + '}';
+    }
+
+    @Override
+    public int compareTo(Object card) {
+        int compareValue= ((Card) card).getValue();
+        return compareValue - this.value;
     }
     
     

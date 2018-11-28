@@ -20,14 +20,15 @@ public class PokerWindow extends javax.swing.JFrame {
     public static Table table1;
     public static int phase = 0;  //the phase represents what part of the hand we are in 0 = preflop, 1=flop,2=turn,3=river
     public ArrayList<javax.swing.JLabel> cardLabels = new ArrayList<>();
-    public ArrayList<javax.swing.JLabel> playerLabels = new ArrayList();
+    //public javax.swing.JLabel[] playerLabels;
+    public ArrayList<javax.swing.JLabel> playerLabels = new ArrayList<>();
 
     /**
      * Creates new form NewJFrame
      */
     public PokerWindow() {
-        this.addLabels();
         initComponents();
+        this.addLabels();
         TableDrawer.generateImageArray(this);
         table1 = new Table(numPlayers);
     }
@@ -395,7 +396,9 @@ public class PokerWindow extends javax.swing.JFrame {
         {
             //the hand is over
             currentPlayer = this.lastPlayer(); //find the last player in hand this is the winner of the hand
-            table1.getPlayers().get(currentPlayer).incBalance(table1.getPot());
+            Player p  = table1.getPlayers().get(currentPlayer);
+            p.incBalance(table1.getPot());
+            playerLabels.get(currentPlayer).setText(String.valueOf(p.getBalance()));
             this.resetTable();
         } else {
             checkPhaseChange();
@@ -420,10 +423,12 @@ public class PokerWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_raiseActionPerformed
 
     private void callActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_callActionPerformed
-        table1.getPlayers().get(currentPlayer).setHasBet(true);
-        table1.getPlayers().get(currentPlayer).decBalance(betAmount);
+        Player p  = table1.getPlayers().get(currentPlayer);
+        p.setHasBet(true);
+        p.decBalance(betAmount); //COME BACK TO THIS 
         table1.incPot(betAmount);
-
+        this.potAmount.setText(Double.toString(table1.getPot()));
+        playerLabels.get(currentPlayer).setText(String.valueOf(p.getBalance()));
         checkPhaseChange();
     }//GEN-LAST:event_callActionPerformed
 
@@ -436,7 +441,6 @@ public class PokerWindow extends javax.swing.JFrame {
         if (playersStillWaiting())
         { //if there are still players waiting to bet
             currentPlayer = choosePlayer();
-            System.out.println(currentPlayer);
         } else
         { //if we get here then move to the next phase
             this.nextPhase();
@@ -462,19 +466,20 @@ public class PokerWindow extends javax.swing.JFrame {
         this.foldButton.setEnabled(true);
         this.raiseButton.setEnabled(false);
         this.callButton.setEnabled(false);
-        
+        System.out.println(phase);
         switch(phase){
-            case 1 : 
+            case 0 : 
                TableDrawer.dealFlop(table1, this);
                break;
-            case 2 : 
+            case 1 : 
                TableDrawer.dealTurn(table1, this);
                break;
-            case 3 : 
+            case 2 : 
                 TableDrawer.dealRiver(table1, this);
                 break;
-            case 4 : 
+            case 3 : 
                 //checkWinner
+                System.out.println("HAND IS OVER");
                 break;
         }
         changePhase();
@@ -482,11 +487,12 @@ public class PokerWindow extends javax.swing.JFrame {
 
     public void betOrRaise() {
         //table1.getPlayers().get(currentPlayer).setTurn(false);
-        table1.getPlayers().get(currentPlayer).setHasBet(true);
+        Player p = table1.getPlayers().get(currentPlayer);
+        p.setHasBet(true);
         int amount = this.betSlider.getValue();
         table1.incPot(amount);
         this.potAmount.setText(Double.toString(table1.getPot()));
-        table1.getPlayers().get(currentPlayer).decBalance(amount);
+        p.decBalance(amount);
 
         this.betButton.setEnabled(false);
         this.checkButton.setEnabled(false);
@@ -494,8 +500,9 @@ public class PokerWindow extends javax.swing.JFrame {
         this.raiseButton.setEnabled(true);
         betAmount = amount;
         resetHasBetFlags(); //since a player just bet this means each player now needs to make another turn
-
+        playerLabels.get(currentPlayer).setText(String.valueOf(p.getBalance()));
         currentPlayer = this.choosePlayer();
+        
     }
 
     public void setBetFlags() {
@@ -544,12 +551,12 @@ public class PokerWindow extends javax.swing.JFrame {
 
     //we need to consider that if the last player to place their bet
     public int choosePlayer() {
-        for (int i = currentPlayer; i < table1.getPlayers().size(); i++)
+        for (int i = currentPlayer + 1; i < table1.getPlayers().size(); i++)
         {
             if (table1.getPlayers().get(i).isInHand() && table1.getPlayers().get(i).isHasBet() == false)
             {
                 this.betSlider.setMaximum((int) table1.getPlayers().get(i).getBalance());
-                this.playerTurnLbl.setText(String.valueOf(currentPlayer));
+                this.playerTurnLbl.setText(String.valueOf(i));
                 return i;
             }
         }
@@ -558,7 +565,7 @@ public class PokerWindow extends javax.swing.JFrame {
             if (table1.getPlayers().get(j).isInHand() && table1.getPlayers().get(j).isHasBet() == false)
             {
                 this.betSlider.setMaximum((int) table1.getPlayers().get(j).getBalance());
-                this.playerTurnLbl.setText(String.valueOf(currentPlayer));
+                this.playerTurnLbl.setText(String.valueOf(j));
                 return j;
             }
         }
@@ -569,7 +576,7 @@ public class PokerWindow extends javax.swing.JFrame {
     public void resetHasBetFlags() {
         //table1.getPlayers().get(currentPlayer).setTurn(false);
         table1.getPlayers().get(currentPlayer).setHasBet(true);
-        for (int i = currentPlayer; i < table1.getPlayers().size(); i++)
+        for (int i = currentPlayer + 1; i < table1.getPlayers().size(); i++)
         {
             if (table1.getPlayers().get(i).isInHand())
             {
@@ -616,7 +623,7 @@ public class PokerWindow extends javax.swing.JFrame {
 
     }
 
-    public void addLabels() {
+    public void addLabels() { 
         this.cardLabels.add(P1Card1);
         this.cardLabels.add(P1Card2);
         this.cardLabels.add(P2Card1);

@@ -5,15 +5,14 @@
  */
 package mypoker;
 
-
-
 /**
  *
- * @author pclab
+ * @author DannySuarez
  */
-public enum Suit {
-    SPADES,
-    CLUBS,
-    HEARTS,
-    DIAMONDS;
+public class Suits {
+    public static final int DIAMONDS = 1;
+    public static final int SPADES = 2;
+    public static final int CLUBS = 3;
+    public static final int HEARTS = 4;
+    
 }

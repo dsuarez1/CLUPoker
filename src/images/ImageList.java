@@ -3,20 +3,19 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package mypoker;
+package images;
 
 import Windows.PokerWindow;
-import java.awt.Image;
 import javax.swing.ImageIcon;
 
 /**
  *
  * @author DannySuarez
  */
-public abstract class TableDrawer {
-    private static ImageIcon[] images = new javax.swing.ImageIcon[60];
+public class ImageList {
+    private ImageIcon[] images = new javax.swing.ImageIcon[60];
     
-    public static void generateImageArray(PokerWindow window){
+    public void ImageList(PokerWindow window){
 //        String path = "/images/2Diamonds.png";
 //        for(int i = 1;i<images.length;i++){
 //            images[1] = new javax.swing.ImageIcon(window.getClass().getResource("/images/2Diamonds.png"));
@@ -80,67 +79,10 @@ public abstract class TableDrawer {
     images[52] = new javax.swing.ImageIcon(window.getClass().getResource("/images/KingHearts.png"));
     images[53] = new javax.swing.ImageIcon(window.getClass().getResource("/images/AceHearts.png"));
 }
-    
-    public static void startHand(Table t,PokerWindow window){
-        int playerNumber = 0;
-        
-        int count =0 ;
-        for(Player p : t.getPlayers()){
-            if(playerNumber ==0){
-                window.P1Balance.setText(String.valueOf(p.getBalance()));
-                window.P1Card1.setIcon(new ImageIcon(images[p.getHand()[0].getImageIndex()].getImage().getScaledInstance(75, 100, Image.SCALE_SMOOTH)));
-                window.P1Card2.setIcon(new ImageIcon(images[p.getHand()[1].getImageIndex()].getImage().getScaledInstance(75, 100, Image.SCALE_SMOOTH)));
-                
-            }
-            else if(playerNumber == 1){
-                window.P2Balance.setText(String.valueOf(p.getBalance()));
-                window.P2Card1.setIcon(new ImageIcon(images[p.getHand()[0].getImageIndex()].getImage().getScaledInstance(75, 100, Image.SCALE_SMOOTH)));
-                window.P2Card2.setIcon(new ImageIcon(images[p.getHand()[1].getImageIndex()].getImage().getScaledInstance(75, 100, Image.SCALE_SMOOTH)));
-            }
-            else if(playerNumber == 2){
-                window.P3Balance.setText(String.valueOf(p.getBalance()));
-                window.P3Card1.setIcon(new ImageIcon(images[p.getHand()[0].getImageIndex()].getImage().getScaledInstance(75, 100, Image.SCALE_SMOOTH)));
-                window.P3Card2.setIcon(new ImageIcon(images[p.getHand()[1].getImageIndex()].getImage().getScaledInstance(75, 100, Image.SCALE_SMOOTH)));
-            }
-            else if(playerNumber == 3){
-                window.P4Balance.setText(String.valueOf(p.getBalance()));
-                window.P4Card1.setIcon(new ImageIcon(images[p.getHand()[0].getImageIndex()].getImage().getScaledInstance(75, 100, Image.SCALE_SMOOTH)));
-                window.P4Card2.setIcon(new ImageIcon(images[p.getHand()[1].getImageIndex()].getImage().getScaledInstance(75, 100, Image.SCALE_SMOOTH)));
-            }
-            playerNumber++;
-        }
+
+    public ImageIcon[] getImages() {
+        return images;
     }
     
-    
-        
-    public static void dealFlop(Table t,PokerWindow window){
-        t.dealFlop();
-        window.TableCard1.setIcon(new ImageIcon(images[t.getTableCards().get(0).getImageIndex()].getImage().getScaledInstance(75, 100, Image.SCALE_SMOOTH)));
-        window.TableCard2.setIcon(new ImageIcon(images[t.getTableCards().get(1).getImageIndex()].getImage().getScaledInstance(75, 100, Image.SCALE_SMOOTH)));
-        window.TableCard3.setIcon(new ImageIcon(images[t.getTableCards().get(2).getImageIndex()].getImage().getScaledInstance(75, 100, Image.SCALE_SMOOTH)));
-    }
-    
-    public static void dealTurn(Table t,PokerWindow window){
-        t.dealTurnOrRiver();
-        window.TableCard4.setIcon(new ImageIcon(images[t.getTableCards().get(3).getImageIndex()].getImage().getScaledInstance(75, 100, Image.SCALE_SMOOTH))); 
-    }
-    
-    public static void dealRiver(Table t,PokerWindow window){
-        t.dealTurnOrRiver();
-        window.TableCard5.setIcon(new ImageIcon(images[t.getTableCards().get(4).getImageIndex()].getImage().getScaledInstance(75, 100, Image.SCALE_SMOOTH))); 
-    }
-    
-    public static void changeCardLabels(PokerWindow window,int PlayerNum,Player p){
-        //make method to change window labels  
-    }
-    
-    public static void resetTable(Table t,PokerWindow window){
-        window.TableCard1.setIcon(new ImageIcon(images[0].getImage().getScaledInstance(75, 100, Image.SCALE_SMOOTH)));
-        window.TableCard2.setIcon(new ImageIcon(images[0].getImage().getScaledInstance(75, 100, Image.SCALE_SMOOTH)));
-        window.TableCard3.setIcon(new ImageIcon(images[0].getImage().getScaledInstance(75, 100, Image.SCALE_SMOOTH)));
-        window.TableCard4.setIcon(new ImageIcon(images[0].getImage().getScaledInstance(75, 100, Image.SCALE_SMOOTH)));
-        window.TableCard5.setIcon(new ImageIcon(images[0].getImage().getScaledInstance(75, 100, Image.SCALE_SMOOTH)));
-    }
-       
     
 }

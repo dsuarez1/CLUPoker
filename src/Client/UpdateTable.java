@@ -3,17 +3,25 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package mypoker;
-
-import Windows.PokerWindow;
-import java.awt.Image;
-import javax.swing.ImageIcon;
+package Client;
 
 /**
  *
  * @author DannySuarez
  */
-public abstract class TableDrawer {
+import GameStates.IGameState;
+import Windows.PokerWindow;
+import java.awt.Image;
+import javax.swing.ImageIcon;
+import mypoker.Card;
+import mypoker.Player;
+import mypoker.Table;
+
+/**
+ *
+ * @author DannySuarez
+ */
+public abstract class UpdateTable {
     private static ImageIcon[] images = new javax.swing.ImageIcon[60];
     
     public static void generateImageArray(PokerWindow window){
@@ -81,6 +89,33 @@ public abstract class TableDrawer {
     images[53] = new javax.swing.ImageIcon(window.getClass().getResource("/images/AceHearts.png"));
 }
     
+
+    
+    public static void updateTableCards(PokerWindow window,IGameState state){
+        for(int i = 0;i < state.getTableCards().size();i++){
+            Card c = state.getTableCards().get(i);
+            javax.swing.JLabel lbl = window.tableCardLabels.get(i);
+            lbl.setIcon(new ImageIcon(images[c.getImageIndex()].getImage().getScaledInstance(75, 100, Image.SCALE_SMOOTH)));
+        }  
+    }
+    
+    
+    public static void updatePot(PokerWindow window,IGameState state){
+    }
+    
+    public static void updatePersonalCards(PokerWindow window,IGameState state){
+
+    }
+    
+    public static void updatePlayerCards(PokerWindow window,IGameState state){
+
+    }
+    
+    public static void updatePlayerBalance(PokerWindow window,IGameState state){
+//        window.P3Balance.setText(String.valueOf(state.getPlayerBalances().get(0)));
+//        System.out.println(state.getPlayerBalances().get(0));
+    }
+    
     public static void startHand(Table t,PokerWindow window){
         int playerNumber = 0;
         
@@ -110,7 +145,6 @@ public abstract class TableDrawer {
             playerNumber++;
         }
     }
-    
     
         
     public static void dealFlop(Table t,PokerWindow window){

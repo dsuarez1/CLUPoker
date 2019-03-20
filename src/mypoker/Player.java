@@ -18,6 +18,9 @@ public class Player {
     private boolean inHand;
     private boolean turn;
     private boolean hasBet;
+    private Hand handRank;
+    private int playerNumber;
+    private String userName;
     
     public Player()
     {
@@ -27,8 +30,42 @@ public class Player {
         this.inHand = false; 
         this.turn = false; 
         this.hasBet = false; //checks if the player has bet in the current round
+        this.handRank = null;
+    }
+    
+    public Player(String name,int num,int balance)
+    {
+        super();
+        this.userName=name;
+        this.playerNumber = num;
     }
 
+    public void setHandRank(Hand handRank) {
+        this.handRank = handRank;
+    }
+
+    public Hand getHandRank() {
+        return handRank;
+    }
+
+    public int getNumber() {
+        return playerNumber;
+    }
+
+    public void setNumber(int number) {
+        this.playerNumber = number;
+    }
+
+    public String getName() {
+        return userName;
+    }
+
+    public void setName(String name) {
+        this.userName = name;
+    }
+
+    
+    
     public boolean isHasBet() {
         return hasBet;
     }
@@ -103,6 +140,7 @@ public class Player {
             this.hand[this.hand_count] = card;
             this.hand_count++;
         }
+        
     }
     
     public Card[] getHand()

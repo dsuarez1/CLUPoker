@@ -5,42 +5,44 @@
  */
 package mypoker;
 
+import java.io.Serializable;
+
 
 
 /**
  *
  * @author pclab
  */
-public class Card implements Comparable{
+public class Card implements Comparable,Serializable{
     //attributes
-    private Suit suit;
     private String suitString;
+    private int suitInt;
     private int imageIndex;
     private int value;
     
     
-    public Card(int s, int v)
+    public Card(int suit, int value)
     {
-        this.value = v;
+        this.value = value;
         this.imageIndex = value;
-        switch(s)
+        switch(suit)
         {
-            case 1:
-                this.suit = Suit.DIAMONDS;
+            case Suits.DIAMONDS:
                 this.suitString = "Diamond";
+                this.suitInt = 0;
                 break;
-            case 2:
-                this.suit = Suit.SPADES;
+            case Suits.SPADES:
+                this.suitInt = 1;
                 this.imageIndex = imageIndex + 13;
                 this.suitString = "Spade";
                 break;
-            case 3:
-                this.suit = Suit.CLUBS;
+            case Suits.CLUBS:
+                this.suitInt = 2;
                 this.imageIndex = imageIndex + 26;
                 this.suitString = "Club";
                 break;
-            case 4:
-                this.suit = Suit.HEARTS;
+            case Suits.HEARTS:
+                this.suitInt = 3;
                 this.imageIndex = imageIndex + 39;
                 this.suitString = "Heart";
                 break;
@@ -48,6 +50,12 @@ public class Card implements Comparable{
         
         
     }
+
+    public int getSuitInt() {
+        return suitInt;
+    }
+    
+    
 
     public String getSuitString() {
         return suitString;
@@ -58,12 +66,6 @@ public class Card implements Comparable{
     }
     
     
-    
-    public Suit getSuit()
-    {
-        return this.suit;
-    }
-    
     public int getValue()
     {
         return this.value;
@@ -71,7 +73,7 @@ public class Card implements Comparable{
 
     @Override
     public String toString() {
-        return "Card{" + value + " Of " + suit + '}';
+        return "Card{" + value + " Of " + suitString + '}';
     }
 
     @Override

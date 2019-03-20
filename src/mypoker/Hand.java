@@ -34,6 +34,11 @@ public class Hand {
     public void setSum(int sum) {
         this.sum = sum;
     }
+
+    @Override
+    public String toString() {
+        return "Hand{" + "rank=" + rank + ", sum=" + sum +'}';
+    }
     
     
 }

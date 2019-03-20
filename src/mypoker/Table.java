@@ -63,6 +63,10 @@ public class Table {
     public void removePlayer(Player p) {
         this.players.remove(p);
     }
+    
+    public void clearCards(){
+        tableCards.clear();
+    }
 
     public void dealPlayers() {
         for (int i = 0; i < players.size(); i++)

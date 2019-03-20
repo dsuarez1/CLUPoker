@@ -3,16 +3,23 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package mypoker;
+package Windows;
 
+import Client.Client;
 import java.awt.Color;
 import java.util.ArrayList;
+import mypoker.Card;
+import mypoker.Deck;
+import mypoker.HandChecker;
+import mypoker.Player;
+import mypoker.Table;
+import mypoker.TableDrawer;
 
 /**
  *
  * @author DannySuarez
  */
-public class PokerWindow extends javax.swing.JFrame {
+public class PokerWindowCOPY extends javax.swing.JFrame {
 
     public static int numPlayers = 4;
     public static int currentPlayer = 0;
@@ -22,13 +29,14 @@ public class PokerWindow extends javax.swing.JFrame {
     public ArrayList<javax.swing.JLabel> cardLabels = new ArrayList<>();
     //public javax.swing.JLabel[] playerLabels;
     public ArrayList<javax.swing.JLabel> playerLabels = new ArrayList<>();
-
+    public Client c;
     /**
      * Creates new form NewJFrame
      */
-    public PokerWindow() {
+    public PokerWindowCOPY() {
         initComponents();
         this.addLabels();
+        this.c = new Client(); 
         TableDrawer.generateImageArray(this);
         table1 = new Table(numPlayers);
     }
@@ -366,23 +374,10 @@ public class PokerWindow extends javax.swing.JFrame {
         this.betOrRaise();
     }//GEN-LAST:event_betButtonActionPerformed
 
+    
 
     private void startHand(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startHand
-        for (Player p : table1.getPlayers())
-        {
-            p.setInHand(true);
-            p.setHand_count(0);
-        }
-        this.betSlider.setMinimum(0);
-
-        this.betSlider.setMaximum((int) table1.getPlayers().get(0).getBalance());
-        table1.dealPlayers();
-        TableDrawer.startHand(table1, this);
-        this.betButton.setEnabled(true);
-        this.checkButton.setEnabled(true);
-        this.foldButton.setEnabled(true);
-        this.startButton.setEnabled(false);
-        //table1.getPlayers().get(currentPlayer).setTurn(true);
+        this.resetTable(); //some of the code in this method is repatative with the start hand code
     }//GEN-LAST:event_startHand
 
     private void foldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_foldActionPerformed
@@ -395,12 +390,9 @@ public class PokerWindow extends javax.swing.JFrame {
         if (table1.getPlayersInHand() == 1)
         {
             //the hand is over
-            currentPlayer = this.lastPlayer(); //find the last player in hand this is the winner of the hand
-            Player p  = table1.getPlayers().get(currentPlayer);
-            p.incBalance(table1.getPot());
-            playerLabels.get(currentPlayer).setText(String.valueOf(p.getBalance()));
-            this.resetTable();
-        } else {
+            payWinner(lastPlayer());
+        } else
+        {
             checkPhaseChange();
         }
 
@@ -409,7 +401,6 @@ public class PokerWindow extends javax.swing.JFrame {
     private void checkButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkButtonActionPerformed
         //table1.getPlayers().get(currentPlayer).setTurn(false);
         table1.getPlayers().get(currentPlayer).setHasBet(true);
-        System.out.println(currentPlayer);
         checkPhaseChange();
     }//GEN-LAST:event_checkButtonActionPerformed
 
@@ -423,7 +414,7 @@ public class PokerWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_raiseActionPerformed
 
     private void callActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_callActionPerformed
-        Player p  = table1.getPlayers().get(currentPlayer);
+        Player p = table1.getPlayers().get(currentPlayer);
         p.setHasBet(true);
         p.decBalance(betAmount); //COME BACK TO THIS 
         table1.incPot(betAmount);
@@ -433,11 +424,11 @@ public class PokerWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_callActionPerformed
 
     private void newGameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newGameActionPerformed
-        Table t =  new Table(numPlayers);
+        Table t = new Table(numPlayers);
         table1 = t;
     }//GEN-LAST:event_newGameActionPerformed
 
-    private void checkPhaseChange(){
+    private void checkPhaseChange() {
         if (playersStillWaiting())
         { //if there are still players waiting to bet
             currentPlayer = choosePlayer();
@@ -446,15 +437,16 @@ public class PokerWindow extends javax.swing.JFrame {
             this.nextPhase();
         }
     }
-    
+
     private void changePhase() {
-        if(phase == 3){
+        if (phase == 3)
+        {
             phase = 0;
+        } else
+        {
+            phase++;
         }
-        else{
-           phase++; 
-        }
-        
+
         currentPlayer = 3;
         this.setBetFlags();
         currentPlayer = choosePlayer();
@@ -466,23 +458,89 @@ public class PokerWindow extends javax.swing.JFrame {
         this.foldButton.setEnabled(true);
         this.raiseButton.setEnabled(false);
         this.callButton.setEnabled(false);
-        System.out.println(phase);
-        switch(phase){
-            case 0 : 
-               TableDrawer.dealFlop(table1, this);
-               break;
-            case 1 : 
-               TableDrawer.dealTurn(table1, this);
-               break;
-            case 2 : 
+        switch (phase)
+        {
+            case 0:
+                TableDrawer.dealFlop(table1, this);
+                break;
+            case 1:
+                TableDrawer.dealTurn(table1, this);
+                break;
+            case 2:
                 TableDrawer.dealRiver(table1, this);
                 break;
-            case 3 : 
-                //checkWinner
+            case 3:
+                checkWinner();
                 System.out.println("HAND IS OVER");
                 break;
         }
         changePhase();
+    }
+//Rework this probably also this doesnt consider ties
+
+    public void checkWinner() {
+        int currentRank = 100;
+        int currentSum = 0;
+        int currentWinner = 100;
+        ArrayList<Card> cards = new ArrayList<Card>();
+        for (Card c : table1.getCards())
+        {
+            cards.add(c);
+        }
+        for (int i = 0; i < table1.getPlayers().size(); i++)
+        {
+            Player p = table1.getPlayers().get(i);
+            if (p.isInHand())
+            {
+                cards.add(p.getHand()[0]);
+                cards.add(p.getHand()[1]);
+                p.setHandRank(HandChecker.findHand(cards));
+                System.out.println("Player " + i + " Rank : " + p.getHandRank().getRank());
+                cards.remove(cards.size() - 1);
+                cards.remove(cards.size() - 1);
+            }
+        }
+
+        for (int i = 0; i < table1.getPlayers().size(); i++)
+        {
+            Player p = table1.getPlayers().get(i);
+            if (p.isInHand())
+            {
+                if (p.getHandRank().getRank() < currentRank)
+                {
+                    currentRank = p.getHandRank().getRank();
+                    currentSum = p.getHandRank().getSum();
+                    currentWinner = i;
+                }
+                if (p.getHandRank().getRank() == currentRank && p.getHandRank().getSum() > currentSum)
+                {
+                    currentRank = p.getHandRank().getRank();
+                    currentSum = p.getHandRank().getSum();
+                    currentWinner = i;
+                }
+            }
+        }
+        payWinner(currentWinner);
+        System.out.println("The winner of the hand is Player " + currentWinner);
+    }
+
+    public void payWinner(int winner) {
+        this.betButton.setEnabled(false);
+        this.checkButton.setEnabled(false);
+        this.foldButton.setEnabled(false);
+        this.raiseButton.setEnabled(false);
+        this.callButton.setEnabled(false);
+        this.startButton.setEnabled(true);
+        Player p = table1.getPlayers().get(winner);
+        p.incBalance(table1.getPot());
+        playerLabels.get(winner).setText(String.valueOf(p.getBalance()));
+    }
+
+    public void printCards(ArrayList<Card> cards) {
+        for (Card c : cards)
+        {
+            System.out.println(c);
+        }
     }
 
     public void betOrRaise() {
@@ -502,7 +560,7 @@ public class PokerWindow extends javax.swing.JFrame {
         resetHasBetFlags(); //since a player just bet this means each player now needs to make another turn
         playerLabels.get(currentPlayer).setText(String.valueOf(p.getBalance()));
         currentPlayer = this.choosePlayer();
-        
+
     }
 
     public void setBetFlags() {
@@ -528,21 +586,23 @@ public class PokerWindow extends javax.swing.JFrame {
     }
 
     public void resetTable() {
-        for (Player p : table1.getPlayers())
-        {
-            //is there more to do here for players???
-            //later should check if balance is > 0 or else they shouldnt be in hand
-            p.setInHand(true);
-            p.setHand_count(0);
-        }
+        TableDrawer.resetTable(table1, this);
+        this.betSlider.setMinimum(0);
+        this.betSlider.setMaximum((int) table1.getPlayers().get(0).getBalance());
+        table1.clearCards();
+        table1.nextHand();
+        table1.dealPlayers();
+        TableDrawer.startHand(table1, this);
+        
+
         table1.setDeck(new Deck()); //repopulate a new deck
         table1.setPot(0);
-        this.betButton.setEnabled(false);
-        this.foldButton.setEnabled(false);
+        this.betButton.setEnabled(true);
+        this.foldButton.setEnabled(true);
         this.raiseButton.setEnabled(false);
-        this.checkButton.setEnabled(false);
+        this.checkButton.setEnabled(true);
         this.callButton.setEnabled(false);
-        this.startButton.setEnabled(true);
+        this.startButton.setEnabled(false);
         this.potAmount.setText("0.00");
         currentPlayer = 0; //just assume the same player starts each hand we will implement blinds and what not later
         phase = 0;
@@ -616,14 +676,14 @@ public class PokerWindow extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
 
-                new PokerWindow().setVisible(true);
+                new PokerWindowCOPY().setVisible(true);
 
             }
         });
 
     }
 
-    public void addLabels() { 
+    public void addLabels() {
         this.cardLabels.add(P1Card1);
         this.cardLabels.add(P1Card2);
         this.cardLabels.add(P2Card1);
